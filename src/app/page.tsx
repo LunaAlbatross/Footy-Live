@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components/ui/Header';
 import { MatchCard } from '@/components/match/MatchCard';
 import { FadeIn } from '@/components/ui/Animations';
-import { Zap, Calendar, CheckCircle2, Trophy, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Activity, Calendar, Trophy, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { getTodaysMatches } from '@/lib/api';
 import { Match } from '@/types/football';
 import { cn } from '@/lib/utils';
@@ -16,11 +15,9 @@ export default function Home() {
   const [filter, setFilter] = useState<'all' | 'live' | 'scheduled' | 'finished'>('all');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const loadMatches = async (showLoading = false) => {
+  const loadMatches = async () => {
     try {
-      if (showLoading) {
-        setLoading(true);
-      }
+      setLoading(true);
       const data = await getTodaysMatches();
       setMatches(data);
       setLastUpdated(new Date());
@@ -32,14 +29,9 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadMatches(false);
-    }, 0);
-    const interval = setInterval(() => loadMatches(false), 30000);
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
+    loadMatches();
+    const interval = setInterval(loadMatches, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const filteredMatches = matches.filter(match => {
@@ -53,42 +45,9 @@ export default function Home() {
   const liveMatches = matches.filter(m => m.status === 'LIVE' || m.status === 'IN_PLAY');
 
   const stats = [
-    {
-      icon: Zap,
-      label: 'Live Now',
-      value: liveMatches.length,
-      gradient: 'from-red-500 to-orange-500',
-      glow: 'shadow-red-500/20',
-      bg: 'bg-red-500/10',
-      text: 'text-red-400',
-    },
-    {
-      icon: Calendar,
-      label: 'Upcoming',
-      value: matches.filter(m => m.status === 'SCHEDULED').length,
-      gradient: 'from-blue-500 to-cyan-500',
-      glow: 'shadow-blue-500/20',
-      bg: 'bg-blue-500/10',
-      text: 'text-blue-400',
-    },
-    {
-      icon: CheckCircle2,
-      label: 'Finished',
-      value: matches.filter(m => m.status === 'FINISHED').length,
-      gradient: 'from-emerald-500 to-green-500',
-      glow: 'shadow-emerald-500/20',
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-    },
-    {
-      icon: Trophy,
-      label: 'Competitions',
-      value: new Set(matches.map(m => m.competition.id)).size,
-      gradient: 'from-violet-500 to-purple-500',
-      glow: 'shadow-violet-500/20',
-      bg: 'bg-violet-500/10',
-      text: 'text-violet-400',
-    },
+    { label: 'Live Telemetry', value: liveMatches.length, icon: <Activity size={18} className="text-red-500" /> },
+    { label: 'Upcoming', value: matches.filter(m => m.status === 'SCHEDULED').length, icon: <Calendar size={18} className="text-emerald-500" /> },
+    { label: 'Competitions', value: new Set(matches.map(m => m.competition.id)).size, icon: <Trophy size={18} className="text-blue-500" /> },
   ];
 
   const filterTabs = [
@@ -99,174 +58,147 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen">
-      <Header darkMode={true} toggleDarkMode={() => {}} />
-
-      <main className="container mx-auto px-4 lg:px-6 py-8 space-y-8">
-        {/* Hero Section */}
-        <FadeIn>
-          <div className="relative overflow-hidden rounded-3xl gradient-border">
-            <div className="relative bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-800/40 p-8 md:p-12 rounded-3xl glass">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] -translate-y-1/3 translate-x-1/3" />
-              <div className="absolute bottom-0 left-0 w-60 h-60 bg-violet-500/8 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3" />
-              <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500/5 rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2" />
-
-              <div className="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                <div className="space-y-4">
-                  {/* Live indicator */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', delay: 0.2 }}
-                    className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold"
-                  >
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-                    </span>
-                    {liveMatches.length > 0 ? `${liveMatches.length} Live Now` : 'Monitoring'}
-                  </motion.div>
-
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
-                    <span className="text-white">Match </span>
-                    <span className="gradient-text">Intelligence</span>
-                  </h1>
-
-                  <p className="text-lg text-gray-400 max-w-xl leading-relaxed">
-                    Real-time statistics, live telemetry, formations, and predictions —
-                    all in one premium experience.
-                  </p>
-                </div>
-
-                {/* Connection status */}
-                <div className="flex items-center gap-3">
-                  {lastUpdated && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-gray-500">
-                      <Wifi className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Updated {lastUpdated.toLocaleTimeString()}</span>
-                    </div>
-                  )}
-                  <motion.button
-                    whileTap={{ rotate: 180 }}
-                    onClick={() => loadMatches(true)}
-                    className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-colors"
-                  >
-                    <RefreshCw className={`w-4 h-4 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
-                  </motion.button>
-                </div>
-              </div>
-            </div>
+    <main className="container mx-auto px-6 py-8">
+      {/* Telemetry Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 mb-2">
+            {liveMatches.length > 0 ? (
+              <span className="live-indicator" />
+            ) : (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
+            )}
+            <span className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+              {liveMatches.length > 0 ? 'Live Feed Active' : 'System Ready'}
+            </span>
           </div>
-        </FadeIn>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, idx) => (
-            <FadeIn key={stat.label} delay={idx * 0.08}>
-              <div className="glass-card p-5 group cursor-default">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2.5 rounded-xl ${stat.bg} transition-colors`}>
-                    <stat.icon className={`w-4.5 h-4.5 ${stat.text}`} />
-                  </div>
-                  <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
-                </div>
-                <motion.div
-                  key={stat.value}
-                  initial={{ scale: 1.2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-3xl font-extrabold text-white tracking-tight"
-                >
-                  {stat.value}
-                </motion.div>
-              </div>
-            </FadeIn>
-          ))}
+          <h1 className="text-4xl font-bold tracking-tight text-white font-outfit">Match Control Center</h1>
+          <p className="text-sm text-zinc-500 max-w-lg">
+            Real-time football data pipeline. Select a match to view advanced telemetry, possession donuts, and timeline events.
+          </p>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          {filterTabs.map((tab) => (
+        <div className="flex items-center gap-3">
+          {lastUpdated && (
+            <div className="telemetry-card px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-zinc-400 rounded-md">
+              <Wifi size={14} className="text-emerald-500" />
+              Sync: {lastUpdated.toLocaleTimeString()}
+            </div>
+          )}
+          <button
+            onClick={loadMatches}
+            className="telemetry-card p-2 hover:text-white text-zinc-400 transition-colors rounded-md"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
+      </div>
+
+      {/* Meta Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {stats.map((stat, idx) => (
+          <FadeIn key={stat.label} delay={idx * 0.1}>
+            <div className="telemetry-card p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded bg-white/5 flex items-center justify-center">
+                  {stat.icon}
+                </div>
+                <span className="text-sm font-medium text-zinc-400">{stat.label}</span>
+              </div>
+              <span className="text-2xl font-bold font-mono text-white">{stat.value}</span>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        {filterTabs.map((tab) => {
+          const isActive = filter === tab.key;
+          return (
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={cn(
-                'relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap',
-                filter === tab.key
-                  ? 'text-white'
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]'
+                'relative px-4 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap',
+                isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
               )}
             >
-              {filter === tab.key && (
-                <motion.div
-                  layoutId="filter-active"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/15 to-emerald-500/5 border border-emerald-500/20"
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+              {isActive && (
+                <motion.div 
+                  layoutId="filter-active-tab"
+                  className="absolute inset-0 rounded-md border border-white/10 bg-white/5 pointer-events-none"
+                  transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}
-              <span className="relative z-10">{tab.label}</span>
-              {tab.badge !== undefined && tab.badge > 0 && (
-                <span className="relative z-10 px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-xs font-bold">
-                  {tab.badge}
-                </span>
-              )}
+              <span className="relative z-10 flex items-center gap-2">
+                {tab.label}
+                {tab.badge !== undefined && tab.badge > 0 && (
+                  <span className={cn(
+                    "px-1.5 py-0.5 rounded text-[10px] font-bold",
+                    isActive ? "bg-red-500/20 text-red-400" : "bg-zinc-800 text-zinc-500"
+                  )}>
+                    {tab.badge}
+                  </span>
+                )}
+              </span>
             </button>
+          );
+        })}
+      </div>
+
+      {/* Match Grid */}
+      {loading ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="telemetry-card p-6 h-[200px] flex flex-col justify-between animate-pulse">
+              <div className="h-4 bg-white/5 w-1/3 rounded" />
+              <div className="flex justify-between items-center">
+                <div className="w-12 h-12 rounded-full bg-white/5" />
+                <div className="h-8 bg-white/5 w-1/4 rounded" />
+                <div className="w-12 h-12 rounded-full bg-white/5" />
+              </div>
+              <div className="h-4 bg-white/5 w-full rounded" />
+            </div>
           ))}
         </div>
-
-        {/* Matches */}
-        {loading ? (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="glass-card p-6 space-y-4">
-                <div className="skeleton h-4 w-1/3" />
-                <div className="flex items-center justify-between">
-                  <div className="skeleton h-10 w-10 rounded-full" />
-                  <div className="skeleton h-8 w-20" />
-                  <div className="skeleton h-10 w-10 rounded-full" />
-                </div>
-                <div className="skeleton h-3 w-2/3 mx-auto" />
+      ) : (
+        <AnimatePresence mode="wait">
+          {filteredMatches.length > 0 ? (
+            <motion.div
+              key={filter}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+              {filteredMatches.map((match, index) => (
+                <FadeIn key={match.id} delay={index * 0.05}>
+                  <MatchCard match={match} />
+                </FadeIn>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="telemetry-card p-12 text-center max-w-lg mx-auto mt-8 border-dashed border-white/20"
+            >
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
+                <WifiOff className="w-8 h-8 text-zinc-500" />
               </div>
-            ))}
-          </div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {filteredMatches.length > 0 ? (
-              <motion.div
-                key={filter}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
-              >
-                {filteredMatches.map((match, index) => (
-                  <FadeIn key={match.id} delay={index * 0.06}>
-                    <MatchCard match={match} />
-                  </FadeIn>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-24"
-              >
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/[0.03] border border-white/[0.06] mb-6">
-                  <WifiOff className="w-8 h-8 text-gray-600" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">No matches found</h3>
-                <p className="text-gray-500 max-w-md mx-auto">
-                  {filter === 'all'
-                    ? 'There are no matches scheduled for the coming days'
-                    : `No ${filter} matches at the moment`}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
-      </main>
-    </div>
+              <h3 className="text-lg font-semibold text-white mb-2 font-outfit">No Telemetry Signal</h3>
+              <p className="text-sm text-zinc-500">
+                {filter === 'all'
+                  ? 'There are no match signals scheduled for the coming days.'
+                  : `No ${filter} matches transmitting at the moment.`}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </main>
   );
 }

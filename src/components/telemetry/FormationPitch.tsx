@@ -50,7 +50,7 @@ export function FormationPitch({ homeLineup, awayLineup, homeTeamName, awayTeamN
   const awayPositions = getPositions(awayLineup.formation, 'away');
 
   return (
-    <div className="telemetry-panel formation-pitch">
+    <div className="telemetry-panel formation-pitch flex flex-col h-full w-full">
       <div className="panel-header">
         <h3 className="panel-title">
           <span className="panel-title-icon">🏟️</span>
@@ -113,31 +113,6 @@ export function FormationPitch({ homeLineup, awayLineup, homeTeamName, awayTeamN
         })}
       </div>
 
-      {/* Bench */}
-      <div className="formation-pitch__bench">
-        <div className="formation-pitch__bench-side">
-          <div className="formation-pitch__bench-label">Bench</div>
-          <div className="formation-pitch__bench-players">
-            {homeLineup.substitutes.slice(0, 7).map(p => (
-              <div key={p.id} className="formation-pitch__bench-player">
-                <span className="formation-pitch__bench-num" style={{ borderColor: homeColor }}>{p.shirtNumber}</span>
-                <span className="formation-pitch__bench-name">{p.name.split(' ').pop()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="formation-pitch__bench-side">
-          <div className="formation-pitch__bench-label">Bench</div>
-          <div className="formation-pitch__bench-players">
-            {awayLineup.substitutes.slice(0, 7).map(p => (
-              <div key={p.id} className="formation-pitch__bench-player">
-                <span className="formation-pitch__bench-num" style={{ borderColor: awayColor }}>{p.shirtNumber}</span>
-                <span className="formation-pitch__bench-name">{p.name.split(' ').pop()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

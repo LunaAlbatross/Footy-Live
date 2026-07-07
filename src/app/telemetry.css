@@ -1,10 +1,4 @@
-/* ===== TELEMETRY DASHBOARD ===== */
-.telemetry-dashboard {
-  min-height: 100vh;
-  background: #050510;
-  color: #e2e8f0;
-  font-family: 'Inter', system-ui, sans-serif;
-}
+/* Dashboard styles moved to layout/tailwind */
 
 .telemetry-dashboard__grid {
   display: grid;
@@ -27,10 +21,10 @@
 
 /* ===== PANELS ===== */
 .telemetry-panel {
-  background: linear-gradient(135deg, rgba(15,15,35,0.95), rgba(10,10,25,0.98));
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .panel-header {
@@ -439,10 +433,11 @@
 
 .formation-pitch__field {
   position: relative;
-  aspect-ratio: 0.85;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   background: linear-gradient(180deg, #0a3d0a 0%, #0d4a0d 25%, #0a3d0a 50%, #0d4a0d 75%, #0a3d0a 100%);
   border-radius: 8px;
-  margin: 8px;
   overflow: visible;
 }
 

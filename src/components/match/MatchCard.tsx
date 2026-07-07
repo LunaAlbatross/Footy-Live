@@ -4,77 +4,34 @@ import { motion } from 'framer-motion';
 import { Clock, MapPin, Users, ChevronRight } from 'lucide-react';
 import { Match } from '@/types/football';
 import { formatTime, formatDate, getStatusBadge, cn } from '@/lib/utils';
-import { PulseDot } from '@/components/ui/Animations';
 import Link from 'next/link';
 
 interface Props {
   match: Match;
   compact?: boolean;
+  onSelect?: (match: Match) => void;
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const isLive = status === 'LIVE' || status === 'IN_PLAY';
-  const isFinished = status === 'FINISHED';
-  const isScheduled = status === 'SCHEDULED';
-
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg',
-        isLive && 'bg-red-500/15 text-red-400 border border-red-500/20',
-        isFinished && 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
-        isScheduled && 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-        !isLive && !isFinished && !isScheduled && 'bg-gray-500/15 text-gray-400 border border-gray-500/20'
-      )}
-    >
-      {isLive && <PulseDot className="!h-2 !w-2" />}
-      {getStatusBadge(status)}
-    </span>
-  );
-}
-
-export function MatchCard({ match, compact = false }: Props) {
+export function MatchCard({ match, compact = false, onSelect }: Props) {
   const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY';
+  const isFinished = match.status === 'FINISHED';
 
   if (compact) {
     return (
       <Link href={`/match/${match.id}`}>
-        <motion.div
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="glass-card p-4 cursor-pointer group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <StatusBadge status={match.status} />
-            {match.competition.emblem && (
-              <img src={match.competition.emblem} alt={match.competition.name} className="w-5 h-5 object-contain opacity-50 group-hover:opacity-80 transition-opacity" />
-            )}
+        <motion.div className="telemetry-card p-3 cursor-pointer group flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {isLive && <span className="live-indicator" />}
+            <span className="text-xs font-semibold text-zinc-400">{match.competition.name}</span>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 flex-1">
-              <img src={match.homeTeam.crest} alt={match.homeTeam.name} className="w-7 h-7 object-contain" />
-              <span className="text-sm font-semibold text-white truncate">{match.homeTeam.shortName}</span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-semibold">{match.homeTeam.shortName}</span>
+            <div className="score-bug px-3 py-1 flex items-center gap-2 font-mono text-sm">
+              <span className={cn("font-bold", isLive ? "text-white" : "text-zinc-300")}>{match.score.fullTime.home ?? '-'}</span>
+              <span className="text-zinc-600">-</span>
+              <span className={cn("font-bold", isLive ? "text-white" : "text-zinc-300")}>{match.score.fullTime.away ?? '-'}</span>
             </div>
-            <div className="flex items-center gap-2 px-3">
-              <span className="text-xl font-extrabold text-white tabular-nums">
-                {match.score.fullTime.home ?? '-'}
-              </span>
-              <span className="text-gray-600 text-sm">:</span>
-              <span className="text-xl font-extrabold text-white tabular-nums">
-                {match.score.fullTime.away ?? '-'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2.5 flex-1 justify-end">
-              <span className="text-sm font-semibold text-white truncate">{match.awayTeam.shortName}</span>
-              <img src={match.awayTeam.crest} alt={match.awayTeam.name} className="w-7 h-7 object-contain" />
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between text-xs text-gray-600">
-            <span>{match.competition.name}</span>
-            {isLive && match.minute && (
-              <span className="text-red-400 font-bold">{match.minute}&apos;</span>
-            )}
+            <span className="text-sm font-semibold">{match.awayTeam.shortName}</span>
           </div>
         </motion.div>
       </Link>
@@ -83,122 +40,90 @@ export function MatchCard({ match, compact = false }: Props) {
 
   return (
     <Link href={`/match/${match.id}`}>
-      <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="glass-card overflow-hidden cursor-pointer group"
-      >
-        {/* Top gradient accent bar */}
-        <div className={cn(
-          'h-1 w-full',
-          isLive
-            ? 'bg-gradient-to-r from-red-500 via-orange-500 to-red-500'
-            : match.status === 'FINISHED'
-              ? 'bg-gradient-to-r from-emerald-500 via-green-400 to-emerald-500'
-              : 'bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500'
-        )} />
+      <motion.div className="telemetry-card flex flex-col h-full cursor-pointer group overflow-hidden">
+        {/* Top Meta Bar */}
+        <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+          <div className="flex items-center gap-2">
+            {match.competition.emblem && (
+              <img src={match.competition.emblem} alt={match.competition.name} className="w-4 h-4 opacity-50 grayscale group-hover:grayscale-0 transition-all" />
+            )}
+            <span className="text-xs font-medium tracking-wide text-zinc-400 uppercase">{match.competition.name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {isLive && <span className="live-indicator" />}
+            <span className={cn(
+              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm",
+              isLive ? "text-red-400 bg-red-400/10" : 
+              isFinished ? "text-zinc-500 bg-white/5" : "text-emerald-400 bg-emerald-400/10"
+            )}>
+              {getStatusBadge(match.status)}
+            </span>
+          </div>
+        </div>
 
-        <div className="p-5 space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <StatusBadge status={match.status} />
-            <div className="flex items-center gap-2 text-gray-500 group-hover:text-gray-400 transition-colors">
-              {match.competition.emblem && (
-                <img src={match.competition.emblem} alt={match.competition.name} className="w-5 h-5 object-contain opacity-60" />
-              )}
-              <span className="text-xs font-medium">{match.competition.name}</span>
+        {/* Main Content */}
+        <div className="p-6 flex-1 flex items-center justify-between">
+          {/* Home Team */}
+          <div className="flex flex-col items-center gap-3 w-1/3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-white/5 blur-xl rounded-full scale-150" />
+              <img src={match.homeTeam.crest} alt={match.homeTeam.name} className="w-14 h-14 object-contain relative z-10 drop-shadow-2xl" />
             </div>
+            <h3 className="text-sm font-semibold text-center leading-tight line-clamp-2">{match.homeTeam.shortName}</h3>
           </div>
 
-          {/* Teams & Score */}
-          <div className="flex items-center justify-between py-2">
-            {/* Home */}
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <motion.img
-                whileHover={{ rotate: 10, scale: 1.15 }}
-                transition={{ type: 'spring' }}
-                src={match.homeTeam.crest}
-                alt={match.homeTeam.name}
-                className="w-11 h-11 object-contain flex-shrink-0"
-              />
-              <div className="min-w-0">
-                <h3 className="text-base font-bold text-white truncate">{match.homeTeam.shortName}</h3>
-                {match.homeLineup && (
-                  <span className="text-[10px] text-gray-600 font-medium">{match.homeLineup.formation}</span>
-                )}
-              </div>
+          {/* Score/Time Bug */}
+          <div className="flex flex-col items-center justify-center w-1/3">
+            <div className="score-bug px-5 py-2 flex items-center justify-center gap-3 w-full max-w-[120px]">
+              <span className="text-3xl font-bold font-mono tracking-tighter">{match.score.fullTime.home ?? '-'}</span>
+              <span className="text-zinc-600 text-xl font-light">-</span>
+              <span className="text-3xl font-bold font-mono tracking-tighter">{match.score.fullTime.away ?? '-'}</span>
             </div>
-
-            {/* Score */}
-            <div className="flex flex-col items-center px-5">
-              <div className="flex items-center gap-2.5">
-                <motion.span
-                  key={`h-${match.score.fullTime.home}`}
-                  initial={{ scale: 1.4, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-3xl font-black text-white tabular-nums"
-                >
-                  {match.score.fullTime.home ?? '-'}
-                </motion.span>
-                <span className="text-xl text-gray-700 font-light">:</span>
-                <motion.span
-                  key={`a-${match.score.fullTime.away}`}
-                  initial={{ scale: 1.4, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-3xl font-black text-white tabular-nums"
-                >
-                  {match.score.fullTime.away ?? '-'}
-                </motion.span>
-              </div>
+            
+            <div className="mt-3 flex flex-col items-center gap-1">
               {match.score.halfTime.home !== null && (
-                <span className="text-[10px] text-gray-600 mt-0.5">
-                  HT: {match.score.halfTime.home}-{match.score.halfTime.away}
+                <span className="text-[10px] font-medium text-zinc-500 uppercase">
+                  HT {match.score.halfTime.home}-{match.score.halfTime.away}
                 </span>
               )}
               {isLive && match.minute && (
-                <span className="text-xs text-red-400 font-bold mt-1">{match.minute}&apos;</span>
+                <span className="text-xs font-bold text-red-500 animate-pulse">
+                  {match.minute}&apos;
+                </span>
               )}
-            </div>
-
-            {/* Away */}
-            <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
-              <div className="min-w-0 text-right">
-                <h3 className="text-base font-bold text-white truncate">{match.awayTeam.shortName}</h3>
-                {match.awayLineup && (
-                  <span className="text-[10px] text-gray-600 font-medium">{match.awayLineup.formation}</span>
-                )}
-              </div>
-              <motion.img
-                whileHover={{ rotate: -10, scale: 1.15 }}
-                transition={{ type: 'spring' }}
-                src={match.awayTeam.crest}
-                alt={match.awayTeam.name}
-                className="w-11 h-11 object-contain flex-shrink-0"
-              />
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-white/[0.04]">
-            <div className="flex items-center gap-3 text-[11px] text-gray-600">
-              {match.venue && match.venue !== 'TBD' && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span className="truncate max-w-[120px]">{match.venue}</span>
-                </div>
-              )}
-              {(match.attendance ?? 0) > 0 && (
-                <div className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  {match.attendance?.toLocaleString()}
-                </div>
-              )}
+          {/* Away Team */}
+          <div className="flex flex-col items-center gap-3 w-1/3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-white/5 blur-xl rounded-full scale-150" />
+              <img src={match.awayTeam.crest} alt={match.awayTeam.name} className="w-14 h-14 object-contain relative z-10 drop-shadow-2xl" />
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-gray-600">
-              <Clock className="w-3 h-3" />
-              {formatTime(match.utcDate)} • {formatDate(match.utcDate)}
-              <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-emerald-400 transition-colors ml-1" />
-            </div>
+            <h3 className="text-sm font-semibold text-center leading-tight line-clamp-2">{match.awayTeam.shortName}</h3>
+          </div>
+        </div>
+
+        {/* Footer Meta */}
+        <div className="px-4 py-3 border-t border-white/5 bg-black/20 flex items-center justify-between mt-auto">
+          <div className="flex items-center gap-3 text-[11px] font-medium text-zinc-500">
+            {match.venue && match.venue !== 'TBD' && (
+              <div className="flex items-center gap-1">
+                <MapPin size={12} />
+                <span className="truncate max-w-[100px]">{match.venue}</span>
+              </div>
+            )}
+            {(match.attendance ?? 0) > 0 && (
+              <div className="flex items-center gap-1">
+                <Users size={12} />
+                <span>{match.attendance?.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-[11px] font-medium text-zinc-500 group-hover:text-emerald-400 transition-colors">
+            <Clock size={12} />
+            <span>{formatTime(match.utcDate)} • {formatDate(match.utcDate)}</span>
+            <ChevronRight size={14} className="ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
           </div>
         </div>
       </motion.div>

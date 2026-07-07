@@ -160,7 +160,7 @@ export function getMockTodaysMatches(): Match[] {
   ];
 }
 
-function getMockMatch(id: number): Match {
+export function getMockMatch(id: number): Match {
   const mockMatches: Record<number, Match> = {
     1: {
       id: 1,
@@ -221,10 +221,10 @@ function getMockMatch(id: number): Match {
       },
       utcDate: new Date().toISOString(),
       status: 'LIVE',
-      minute: 34,
+      minute: 78,
       score: {
-        fullTime: { home: 1, away: 1 },
-        halfTime: { home: 0, away: 0 },
+        fullTime: { home: 3, away: 1 },
+        halfTime: { home: 2, away: 0 },
       },
       events: getMockEvents(2),
       statistics: getMockStatistics(),
@@ -353,7 +353,10 @@ function getMockEvents(matchId: number, homeTeamId?: number, awayTeamId?: number
     2: [
       { id: 6, type: 'card', minute: 12, teamId: aId, playerId: 7, playerName: 'Federico Valverde', cardType: 'yellow' },
       { id: 7, type: 'goal', minute: 28, teamId: hId, playerId: 8, playerName: 'Robert Lewandowski', assistPlayerName: 'Pedri' },
-      { id: 8, type: 'goal', minute: 31, teamId: aId, playerId: 9, playerName: 'Vinícius Júnior' },
+      { id: 8, type: 'goal', minute: 41, teamId: hId, playerId: 10, playerName: 'Lamine Yamal' },
+      { id: 81, type: 'substitution', minute: 55, teamId: aId, playerOut: { id: 11, name: 'Toni Kroos', shirtNumber: 8, position: 'MID' }, playerIn: { id: 12, name: 'Eduardo Camavinga', shirtNumber: 12, position: 'MID' } },
+      { id: 9, type: 'goal', minute: 67, teamId: aId, playerId: 9, playerName: 'Vinícius Júnior' },
+      { id: 10, type: 'goal', minute: 76, teamId: hId, playerId: 8, playerName: 'Robert Lewandowski' },
     ],
     3: [
       { id: 9, type: 'card', minute: 45, teamId: hId, playerId: 10, playerName: 'Fikayo Tomori', cardType: 'yellow' },
