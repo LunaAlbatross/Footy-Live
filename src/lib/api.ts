@@ -192,8 +192,8 @@ export function getMockMatch(id: number): Match {
       },
       events: getMockEvents(1),
       statistics: getMockStatistics(),
-      homeLineup: getMockLineup('home'),
-      awayLineup: getMockLineup('away'),
+      homeLineup: getMockLineup('home', 1),
+      awayLineup: getMockLineup('away', 1),
       venue: 'Emirates Stadium',
       attendance: 60260,
       referee: 'Michael Oliver',
@@ -228,8 +228,8 @@ export function getMockMatch(id: number): Match {
       },
       events: getMockEvents(2),
       statistics: getMockStatistics(),
-      homeLineup: getMockLineup('home'),
-      awayLineup: getMockLineup('away'),
+      homeLineup: getMockLineup('home', 2),
+      awayLineup: getMockLineup('away', 2),
       venue: 'Camp Nou',
       attendance: 99354,
       referee: 'Antonio Mateu Lahoz',
@@ -264,8 +264,8 @@ export function getMockMatch(id: number): Match {
       },
       events: getMockEvents(3),
       statistics: getMockStatistics(),
-      homeLineup: getMockLineup('home'),
-      awayLineup: getMockLineup('away'),
+      homeLineup: getMockLineup('home', 3),
+      awayLineup: getMockLineup('away', 3),
       venue: 'San Siro',
       attendance: 75923,
       referee: 'Daniele Orsato',
@@ -399,7 +399,65 @@ function getMockStatistics(): MatchStatistics {
   };
 }
 
-function getMockLineup(side: 'home' | 'away'): Lineup {
+function getMockLineup(side: 'home' | 'away', matchId: number = 1): Lineup {
+  if (matchId === 2) {
+    const barcaPlayers: any[] = [
+      { id: 101, name: 'Marc-André ter Stegen', shirtNumber: 1, position: 'GK' },
+      { id: 102, name: 'Jules Koundé', shirtNumber: 23, position: 'DEF' },
+      { id: 103, name: 'Ronald Araujo', shirtNumber: 4, position: 'DEF' },
+      { id: 104, name: 'Andreas Christensen', shirtNumber: 15, position: 'DEF' },
+      { id: 105, name: 'João Cancelo', shirtNumber: 2, position: 'DEF' },
+      { id: 106, name: 'Frenkie de Jong', shirtNumber: 21, position: 'MID' },
+      { id: 107, name: 'Ilkay Gündogan', shirtNumber: 22, position: 'MID' },
+      { id: 108, name: 'Pedri', shirtNumber: 8, position: 'MID' },
+      { id: 109, name: 'Lamine Yamal', shirtNumber: 27, position: 'FWD' },
+      { id: 110, name: 'João Félix', shirtNumber: 14, position: 'FWD' },
+      { id: 111, name: 'Robert Lewandowski', shirtNumber: 9, position: 'FWD' },
+    ];
+    
+    const madridPlayers: any[] = [
+      { id: 201, name: 'Thibaut Courtois', shirtNumber: 1, position: 'GK' },
+      { id: 202, name: 'Dani Carvajal', shirtNumber: 2, position: 'DEF' },
+      { id: 203, name: 'Antonio Rüdiger', shirtNumber: 22, position: 'DEF' },
+      { id: 204, name: 'Eder Militão', shirtNumber: 3, position: 'DEF' },
+      { id: 205, name: 'Ferland Mendy', shirtNumber: 23, position: 'DEF' },
+      { id: 206, name: 'Aurélien Tchouaméni', shirtNumber: 18, position: 'MID' },
+      { id: 207, name: 'Toni Kroos', shirtNumber: 8, position: 'MID' },
+      { id: 208, name: 'Federico Valverde', shirtNumber: 15, position: 'MID' },
+      { id: 209, name: 'Jude Bellingham', shirtNumber: 5, position: 'MID' },
+      { id: 210, name: 'Rodrygo', shirtNumber: 11, position: 'FWD' },
+      { id: 211, name: 'Vinícius Júnior', shirtNumber: 7, position: 'FWD' },
+    ];
+    
+    const barcaSubs: any[] = [
+      { id: 301, name: 'Iñaki Peña', shirtNumber: 13, position: 'GK' },
+      { id: 302, name: 'Iñigo Martínez', shirtNumber: 5, position: 'DEF' },
+      { id: 303, name: 'Sergi Roberto', shirtNumber: 20, position: 'MID' },
+      { id: 304, name: 'Gavi', shirtNumber: 6, position: 'MID' },
+      { id: 305, name: 'Raphinha', shirtNumber: 11, position: 'FWD' },
+      { id: 306, name: 'Ferran Torres', shirtNumber: 7, position: 'FWD' },
+    ];
+
+    const madridSubs: any[] = [
+      { id: 401, name: 'Andriy Lunin', shirtNumber: 13, position: 'GK' },
+      { id: 402, name: 'Nacho', shirtNumber: 6, position: 'DEF' },
+      { id: 403, name: 'Eduardo Camavinga', shirtNumber: 12, position: 'MID' },
+      { id: 404, name: 'Luka Modrić', shirtNumber: 10, position: 'MID' },
+      { id: 405, name: 'Brahim Díaz', shirtNumber: 21, position: 'FWD' },
+      { id: 406, name: 'Joselu', shirtNumber: 14, position: 'FWD' },
+    ];
+
+    return {
+      formation: side === 'home' ? '4-3-3' : '4-2-3-1',
+      startingXI: side === 'home' ? barcaPlayers : madridPlayers,
+      substitutes: side === 'home' ? barcaSubs : madridSubs,
+      coach: {
+        name: side === 'home' ? 'Xavi Hernandez' : 'Carlo Ancelotti',
+      },
+    };
+  }
+
+  // Default Arsenal vs Man City
   const homePlayers: any[] = [
     { id: 101, name: 'Aaron Ramsdale', shirtNumber: 1, position: 'GK' },
     { id: 102, name: 'Ben White', shirtNumber: 4, position: 'DEF' },
