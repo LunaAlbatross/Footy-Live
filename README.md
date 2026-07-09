@@ -30,15 +30,6 @@
 
 It ingests live match data and translates it into interactive visualizations like a dynamic tactical pitch, real-time momentum charts, and customized event logs—all wrapped in a bespoke, glassmorphism dark-mode UI.
 
----
-
-## 📸 Showcase
-
-> **Note:** Add a GIF or screenshot of your dashboard here for maximum impact!
-> 
-> *`![Dashboard Screenshot](link-to-your-image.png)`*
-
----
 
 ## 🚀 Key Features
 
