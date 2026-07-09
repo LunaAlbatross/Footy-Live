@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/ui/Header';
+
 import { FadeIn } from '@/components/ui/Animations';
 import { Trophy, Globe2 } from 'lucide-react';
 import { getCompetitions } from '@/lib/api';
@@ -36,7 +36,7 @@ export default function LeaguesPage() {
 
   return (
     <div className="min-h-screen">
-      <Header darkMode={true} toggleDarkMode={() => {}} />
+
 
       <main className="container mx-auto px-4 lg:px-6 py-8 space-y-8">
         {/* Page Header */}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/ui/Header';
+
 import { MatchCard } from '@/components/match/MatchCard';
 import { FadeIn } from '@/components/ui/Animations';
 import { getTodaysMatches } from '@/lib/api';
@@ -45,7 +45,7 @@ export default function MultiMatchPage() {
 
   return (
     <div className="min-h-screen">
-      <Header darkMode={true} toggleDarkMode={() => {}} />
+
 
       <main className="container mx-auto px-4 lg:px-6 py-8 space-y-8">
         {/* Page Header */}
